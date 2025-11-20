@@ -1,0 +1,9 @@
+
+readabilipy==0.3.0
+readability_lxml==0.8.4.1
+resiliparse==0.15.2
+justext==3.0.2
+gne==0.3.1
+goose3==3.1.20
+boilerpy3==1.0.7
+crawl4ai==0.7.7

@@ -1,0 +1,16 @@
+beautifulsoup4==4.14.2
+fastapi==0.121.3
+html2text==2025.4.15
+html_text==0.7.1
+jieba==0.42.1
+lxml==6.0.2
+pandas==2.3.3
+pydantic==2.12.4
+ray==2.51.1
+rouge_score==0.1.2
+setuptools==80.9.0
+torch==2.9.0
+trafilatura==2.0.0
+transformers==4.57.1
+uvicorn==0.38.0
+vllm==0.11.1
