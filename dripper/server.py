@@ -130,7 +130,7 @@ if __name__ == '__main__':
     # The server runs on all network interfaces (0.0.0.0) and uses a single worker
     # process with uvloop for better async performance
     uvicorn.run(
-        'server:app',
+        app,
         host='0.0.0.0',  # Listen on all network interfaces
         port=PORT,
         workers=1,  # Single worker process
