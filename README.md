@@ -1,6 +1,6 @@
-# Dripper(MinerU-HTML)
+# MinerU-HTML(Dripper)
 
-**Dripper(MinerU-HTML)** is an advanced HTML main content extraction tool based on Large Language Models (LLMs). It provides a complete pipeline for extracting primary content from HTML pages using LLM-based classification and state machine-guided generation.
+**MinerU-HTML(Dripper)** is an advanced HTML main content extraction tool based on Large Language Models (LLMs). It provides a complete pipeline for extracting primary content from HTML pages using LLM-based classification and state machine-guided generation.
 
 ## Features
 
@@ -79,14 +79,27 @@ dripper = Dripper(
     config={
         'model_path': '/path/to/your/model',
         'tp': 1,  # Tensor parallel size
-        'state_machine': None,
         'use_fall_back': True,
         'raise_errors': False,
     }
 )
 
 # Extract main content from HTML
-html_content = "<html>...</html>"
+html_content = """
+<html>
+  <body>
+    <div>
+    <h1>This is a title</h1>
+    <p>This is a paragraph</p>
+    <p>End of content</p>
+    </div>
+    <div>
+    <p>Related content</p>
+    <p>Advertising content</p>
+    </div>
+  </body>
+</html>
+"""
 result = dripper.process(html_content)
 
 # Access results
@@ -183,7 +196,6 @@ This project is licensed under the Apache License, Version 2.0. See the [LICENCE
 This project contains code and model weights derived from Qwen3. Original Qwen3 Copyright 2024 Alibaba Cloud, licensed under Apache License 2.0. Modifications and additional training Copyright 2025 OpenDatalab Shanghai AILab, licensed under Apache License 2.0.
 
 For more information, please see the [NOTICE](NOTICE) file.
-
 
 ## Contributing
 

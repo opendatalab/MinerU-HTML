@@ -5,12 +5,43 @@ This module provides various extractor implementations for benchmarking,
 including implementations based on popular libraries like trafilatura,
 readability, magic-html, and custom Dripper extractors.
 """
-
 import asyncio
 import re
 from abc import ABC, abstractmethod
 
-from dripper.eval.process import html_to_text_func
+import html_text
+
+
+class HTML2TextWrapper:
+    def __init__(self):
+        import html2text
+        self.converter = html2text.HTML2Text(bodywidth=0)
+        self.converter.ignore_links = True
+        self.converter.ignore_images = True
+
+    def __call__(self, html_str: str, url: str = '') -> str:
+        self.converter.baseurl = url
+        text = self.converter.handle(html_str)
+        self.converter.baseurl = ''
+        return text
+
+
+def html_to_text_func(html_str: str, url: str, format: str) -> str:
+    """Convert a html string to a text string
+
+    Args:
+        html_str (str): the html string
+        url (str, optional): the url of the html string. Defaults to "".
+        format (str, optional): the format of the text string. Defaults to "MD".
+    Returns:
+        content (str): the text string
+    """
+    if format == 'MD':
+        instance = HTML2TextWrapper()
+        return instance(html_str, url)
+    else:
+
+        return html_text.extract_text(html_str)
 
 
 class BaseExtractor(ABC):
@@ -543,134 +574,6 @@ class Trafilatura_MD_Extractor(MainContentExtractor):
     def extract(self, input_html: str, url: str) -> tuple[str, str]:
         """
         Extract Markdown content using trafilatura.
-
-        Args:
-            input_html: Raw HTML string
-            url: URL where the HTML was obtained from
-
-        Returns:
-            Tuple of (empty string, extracted Markdown content)
-        """
-        from trafilatura import extract
-
-        output_markdown = extract(input_html, url=url, options=self.options)
-        if not output_markdown:
-            output_markdown = ''
-        return '', output_markdown
-
-
-class TrafilaturaWOCommentsExtractor(MainHTMLExtractor):
-    """
-    HTML extractor using trafilatura library (without comments).
-
-    Extracts main HTML content using trafilatura with comments disabled.
-    """
-
-    def __init__(self, name: str):
-        """
-        Initialize TrafilaturaWOCommentsExtractor.
-
-        Args:
-            name: Name identifier for this extractor
-        """
-        super().__init__(name)
-        from trafilatura.settings import Extractor
-
-        self.options = Extractor(output_format='html', comments=False)
-
-    def extract_main_html(self, input_html, url) -> str:
-        """
-        Extract main HTML using trafilatura (without comments).
-
-        Args:
-            input_html: Raw HTML string
-            url: URL where the HTML was obtained from
-
-        Returns:
-            Extracted main HTML (or None if extraction fails)
-        """
-        from trafilatura import extract
-
-        output_html = extract(input_html, url=url, options=self.options)
-        return output_html
-
-
-class Trafilatura_WOComments_HTML_MD_Extractor(TrafilaturaWOCommentsExtractor):
-    """Trafilatura HTML extractor (no comments) with Markdown output format."""
-
-    def set_format(self):
-        """Set output format to Markdown."""
-        self.format = 'MD'
-
-
-class Trafilatura_WOComments_HTML_Text_Extractor(TrafilaturaWOCommentsExtractor):
-    """Trafilatura HTML extractor (no comments) with plain text output format."""
-
-    def set_format(self):
-        """Set output format to plain text."""
-        self.format = 'TEXT'
-
-
-class Trafilatura_WOComments_Text_Extractor(MainContentExtractor):
-    """
-    Text extractor using trafilatura library (without comments).
-
-    Extracts plain text content directly using trafilatura with comments disabled.
-    """
-
-    def __init__(self, name: str):
-        """
-        Initialize Trafilatura_WOComments_Text_Extractor.
-
-        Args:
-            name: Name identifier for this extractor
-        """
-        self.name = name
-        from trafilatura.settings import Extractor
-
-        self.options = Extractor(output_format='txt', comments=False)
-
-    def extract(self, input_html: str, url: str) -> tuple[str, str]:
-        """
-        Extract plain text using trafilatura (without comments).
-
-        Args:
-            input_html: Raw HTML string
-            url: URL where the HTML was obtained from
-
-        Returns:
-            Tuple of (empty string, extracted text content)
-        """
-        from trafilatura import extract
-
-        output_markdown = extract(input_html, url=url, options=self.options)
-        if not output_markdown:
-            output_markdown = ''
-        return '', output_markdown
-
-
-class Trafilatura_WOComments_MD_Extractor(MainContentExtractor):
-    """
-    Markdown extractor using trafilatura library (without comments).
-
-    Extracts content as Markdown directly using trafilatura with comments disabled.
-    """
-
-    def __init__(self, name: str):
-        """
-        Initialize Trafilatura_WOComments_MD_Extractor.
-
-        Args:
-            name: Name identifier for this extractor
-        """
-        self.name = name
-        from trafilatura.settings import Extractor
-
-        self.options = Extractor(output_format='markdown', comments=False)
-
-    def extract(self, input_html: str, url: str) -> tuple[str, str]:
-        """
-        Extract Markdown content using trafilatura (without comments).
 
         Args:
             input_html: Raw HTML string
@@ -1577,14 +1480,6 @@ class ExtractorFactory:
             'trafilatura-html-text': Trafilatura_HTML_Text_Extractor,
             'trafilatura-text': Trafilatura_Text_Extractor,
             'trafilatura-md': Trafilatura_MD_Extractor,
-            'trafilatura-wo-comments-html-md': (
-                Trafilatura_WOComments_HTML_MD_Extractor
-            ),
-            'trafilatura-wo-comments-html-text': (
-                Trafilatura_WOComments_HTML_Text_Extractor
-            ),
-            'trafilatura-wo-comments-text': Trafilatura_WOComments_Text_Extractor,
-            'trafilatura-wo-comments-md': Trafilatura_WOComments_MD_Extractor,
             'resiliparse': ResiliparseTextExtractor,
             'readability-html-md': Readability_HTML_MD_Extractor,
             'readability-html-text': Readability_HTML_Text_Extractor,
