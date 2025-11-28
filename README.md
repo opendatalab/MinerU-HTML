@@ -13,7 +13,7 @@
 - 🔧 **Multiple Extractors**: Supports various baseline extractors for comparison
 
 ## Evaluation Results
-We evaluated MinerU-HTML on the [WebMainBench](https://github.com/ccprocessor/WebMainBench/) benchmark, which contains 7,887 meticulously annotated web pages along with their corresponding Markdown-formatted main content converted using `html2text`. This benchmark measures the extraction accuracy of content extractors by computing ROUGE-N scores between the extracted results and ground-truth content. The primary evaluation results are presented in the table below:
+We evaluated MinerU-HTML on the [WebMainBench](https://github.com/opendatalab/WebMainBench/) benchmark, which contains 7,887 meticulously annotated web pages along with their corresponding Markdown-formatted main content converted using `html2text`. This benchmark measures the extraction accuracy of content extractors by computing ROUGE-N scores between the extracted results and ground-truth content. The primary evaluation results are presented in the table below:
 
 | Extractor                | ROUGE-N.f1 |
 |--------------------------|------------|
