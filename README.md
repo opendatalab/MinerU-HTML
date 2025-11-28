@@ -236,3 +236,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - Uses [Trafilatura](https://github.com/adbar/trafilatura) for fallback extraction
 - Finetuned on [Qwen3](https://github.com/QwenLM/Qwen3)
 - Inspired by various HTML content extraction research
+- Pairwise win rates LLM-as-a-judge by [dingo](https://github.com/MigoXLab/dingo)
