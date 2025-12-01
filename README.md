@@ -144,12 +144,10 @@ main_html = result[0].main_html
 # Start the server
 python -m dripper.server \
     --model_path /path/to/your/model \
-    --state_machine None \
     --port 7986
 
 # Or use environment variables
 export DRIPPER_MODEL_PATH=/path/to/your/model
-export DRIPPER_STATE_MACHINE=None
 export DRIPPER_PORT=7986
 python -m dripper.server
 ```
@@ -160,7 +158,7 @@ Then make requests to the API:
 # Extract main content
 curl -X POST "http://localhost:7986/extract" \
   -H "Content-Type: application/json" \
-  -d '{"html": "<html>...</html>", "url": "https://example.com"}'
+  -d '{"html": "<html><body>Hello World</body></html>", "url": "https://example.com"}'
 
 # Health check
 curl http://localhost:7986/health
@@ -197,7 +195,7 @@ from dripper.api import Dripper
 dripper = Dripper(config={'model_path': '/path/to/model'})
 
 # Process multiple HTML strings
-html_list = ["<html>...</html>", "<html>...</html>"]
+html_list = ["<html><body>Hello,</body></html>", "<html><body>World!</body></html>"]
 results = dripper.process(html_list)
 
 for result in results:
