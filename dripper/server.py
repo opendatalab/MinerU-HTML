@@ -6,6 +6,7 @@ extracted main HTML using the Dripper extraction engine.
 """
 
 import argparse
+import json
 import logging
 import os
 from typing import Any, Dict
@@ -53,6 +54,7 @@ args = parser.parse_args()
 MODEL_PATH = os.getenv('DRIPPER_MODEL_PATH', args.model_path)
 STATE_MACHINE = os.getenv('DRIPPER_STATE_MACHINE', args.state_machine)
 PORT = int(os.getenv('DRIPPER_PORT', str(args.port)))
+VLLM_KWARGS = json.loads(os.getenv('DRIPPER_VLLM_KWARGS', '{}'))
 
 # -------------- Global Singleton --------------
 # Initialize Dripper instance as a global singleton for reuse across requests
@@ -64,6 +66,7 @@ dripper = Dripper(
         'use_fall_back': True,  # Use fallback mechanism on errors
         'raise_errors': False,  # Don't raise exceptions, return None instead
         'early_load': True,  # Load model early during initialization
+        'vllm_kwargs': VLLM_KWARGS,  # Additional vLLM constructor kwargs
     }
 )
 

@@ -69,6 +69,7 @@ class Dripper:
         raise_errors (bool): Whether to raise exceptions on errors
         use_fall_back (bool): Whether to use fallback extraction method
         state_machine (str): State machine version for logits processing
+        vllm_kwargs (Dict[str, Any]): Additional kwargs to pass to vLLM
     """
 
     def __init__(self, config: Dict[str, Any]) -> None:
@@ -90,6 +91,7 @@ class Dripper:
         self.use_fall_back = config.get('use_fall_back', True)
         self.state_machine = config.get('state_machine', None)
         self.early_load = config.get('early_load', False)
+        self.vllm_kwargs = config.get('vllm_kwargs', {})
 
         # Lazy-loaded attributes (initialized on first use)
         self._llm: Optional[LLM] = None
@@ -205,7 +207,9 @@ class Dripper:
             try:
                 logger.info(f'Loading model: {self.model_path}')
                 self._llm = LLM(
-                    model=self.model_path, tensor_parallel_size=self.tp
+                    model=self.model_path, 
+                    tensor_parallel_size=self.tp,
+                    **self.vllm_kwargs
                 )
                 logger.info('Model loading completed')
             except Exception as e:

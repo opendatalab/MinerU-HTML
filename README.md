@@ -177,12 +177,14 @@ curl http://localhost:7986/health
 | `raise_errors`  | bool | False        | Raise exceptions on errors (vs returning None) |
 | `debug`         | bool | False        | Enable debug logging                           |
 | `early_load`    | bool | False        | Load model during initialization               |
+| `vllm_kwargs`   | dict | `{}`         | Additional kwargs to pass to vLLM constructor  |
 
 ### Environment Variables
 
 - `DRIPPER_MODEL_PATH`: Path to the LLM model
 - `DRIPPER_STATE_MACHINE`: State machine version (default:None)
 - `DRIPPER_PORT`: Server port number (default: 7986)
+- `DRIPPER_VLLM_KWARGS`: JSON string of additional vLLM kwargs (default: `{}`)
 - `VLLM_USE_V1`: Must be set to `'0'` when using state machine
 
 ## Usage Examples
