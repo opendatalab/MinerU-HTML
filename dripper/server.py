@@ -6,6 +6,7 @@ extracted main HTML using the Dripper extraction engine.
 """
 
 import argparse
+import json
 import logging
 import os
 from typing import Any, Dict
@@ -53,17 +54,22 @@ args = parser.parse_args()
 MODEL_PATH = os.getenv('DRIPPER_MODEL_PATH', args.model_path)
 STATE_MACHINE = os.getenv('DRIPPER_STATE_MACHINE', args.state_machine)
 PORT = int(os.getenv('DRIPPER_PORT', str(args.port)))
+INFERENCE_BACKEND = os.getenv('INFERENCE_BACKEND', 'vllm')
+MODEL_INIT_KWARGS = json.loads(os.getenv('MODEL_INIT_KWARGS', '{}'))
+MODEL_GEN_KWARGS = json.loads(os.getenv('MODEL_GEN_KWARGS', '{}'))
 
 # -------------- Global Singleton --------------
 # Initialize Dripper instance as a global singleton for reuse across requests
 dripper = Dripper(
     config={
         'model_path': MODEL_PATH,
-        'tp': 1,  # Tensor parallel size
         'state_machine': STATE_MACHINE,
         'use_fall_back': True,  # Use fallback mechanism on errors
         'raise_errors': False,  # Don't raise exceptions, return None instead
         'early_load': True,  # Load model early during initialization
+        'inference_backend': INFERENCE_BACKEND,
+        'model_init_kwargs': MODEL_INIT_KWARGS,
+        'model_gen_kwargs': MODEL_GEN_KWARGS,
     }
 )
 

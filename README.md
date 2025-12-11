@@ -110,9 +110,15 @@ from dripper.api import Dripper
 dripper = Dripper(
     config={
         'model_path': '/path/to/your/model',
-        'tp': 1,  # Tensor parallel size
         'use_fall_back': True,
         'raise_errors': False,
+        'inference_backend': "vllm",
+        "model_init_kwargs": {
+          'tensor_parallel_size': 1,  # Tensor parallel size
+        },
+        "model_gen_kwargs": {
+          'temperature': 0.0,
+        },
     }
 )
 
@@ -168,15 +174,17 @@ curl http://localhost:7986/health
 
 ### Dripper Configuration Options
 
-| Parameter       | Type | Default      | Description                                    |
-| --------------- | ---- | ------------ | ---------------------------------------------- |
-| `model_path`    | str  | **Required** | Path to the LLM model directory                |
-| `tp`            | int  | 1            | Tensor parallel size for model inference       |
-| `state_machine` | str  | None         | State machine version                          |
-| `use_fall_back` | bool | True         | Enable fallback to trafilatura on errors       |
-| `raise_errors`  | bool | False        | Raise exceptions on errors (vs returning None) |
-| `debug`         | bool | False        | Enable debug logging                           |
-| `early_load`    | bool | False        | Load model during initialization               |
+| Parameter           | Type | Default      | Description                                    |
+| ------------------- | ---- | ------------ | ---------------------------------------------- |
+| `model_path`        | str  | **Required** | Path to the LLM model directory                |
+| `state_machine`     | str  | None         | State machine version                          |
+| `use_fall_back`     | bool | True         | Enable fallback to trafilatura on errors       |
+| `raise_errors`      | bool | False        | Raise exceptions on errors (vs returning None) |
+| `debug`             | bool | False        | Enable debug logging                           |
+| `early_load`        | bool | False        | Load model during initialization               |
+| `inference_backend` | str  | `vllm`       | The inference backend you want to use          |
+| `model_init_kwargs` | dict | `{}`         | Parameters used during model initialization    |
+| `model_gen_kwargs`  | dict | `{}`         | Parameters used during model inference         |
 
 ### Environment Variables
 
@@ -184,6 +192,9 @@ curl http://localhost:7986/health
 - `DRIPPER_STATE_MACHINE`: State machine version (default:None)
 - `DRIPPER_PORT`: Server port number (default: 7986)
 - `VLLM_USE_V1`: Must be set to `'0'` when using state machine
+- `INFERENCE_BACKEND`: Inference backend to use (default `vllm`)
+- `MODEL_INIT_KWARGS`: JSON string of model initialization kwargs (default `{}`)
+- `MODEL_GEN_KWARGS`: JSON string of model inference kwargs (default `{}`)
 
 ## Usage Examples
 

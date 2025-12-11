@@ -108,7 +108,7 @@ def generate(
         case_id = input_data.case_id
         output_list.append(
             DripperGenerateOutput(
-                case_id=case_id, response=res_data.outputs[0].text
+                case_id=case_id, response=res_data.generated_text
             )
         )
     return output_list

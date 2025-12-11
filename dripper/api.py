@@ -18,7 +18,9 @@ from dripper.exceptions import (DripperConfigError, DripperEnvError,
                                 DripperLoadModelError, DripperPostprocessError,
                                 DripperPreprocessError,
                                 DripperResponseParseError, DripperTypeError)
-from dripper.inference.imp import InferenceBackend, VLLMInferenceBackend
+from dripper.inference.imp import (InferenceBackend,
+                                   TransformersInferenceBackend,
+                                   VLLMInferenceBackend)
 from dripper.inference.inference import generate
 from dripper.inference.logits import parse_llm_response
 from dripper.inference.prompt import get_full_prompt
@@ -64,12 +66,13 @@ class Dripper:
     Attributes:
         config (Dict[str, Any]): Configuration dictionary
         model_path (str): Path to the model file
-        tp (int): Tensor parallel size
         debug (bool): Whether debug mode is enabled
         raise_errors (bool): Whether to raise exceptions on errors
         use_fall_back (bool): Whether to use fallback extraction method
         state_machine (str): State machine version for logits processing
         inference_backend (str): The inference backend you want to use. The default is vllm.
+        model_init_kwargs (dict): Parameters used during model initialization. If not provided, default parameters will be used.
+        model_gen_kwargs (dict): Parameters used during model inference. If not provided, default parameters will be used.
     """
 
     def __init__(self, config: Dict[str, Any]) -> None:
@@ -85,13 +88,14 @@ class Dripper:
         self.config = self._validate_config(config)
         self.max_sequence_length = 32 * 1024  # Maximum sequence length for the model
         self.model_path = config['model_path']
-        self.tp = config.get('tp', 1)
         self.raise_errors = config.get('raise_errors', False)
         self.debug = config.get('debug', False)
         self.use_fall_back = config.get('use_fall_back', True)
         self.state_machine = config.get('state_machine', None)
         self.early_load = config.get('early_load', False)
         self.inference_backend = config.get('inference_backend', 'vllm')
+        self.model_init_kwargs = config.get('model_init_kwargs', {})
+        self.model_gen_kwargs = config.get('model_gen_kwargs', {})
 
         # Lazy-loaded attributes (initialized on first use)
         self._llm: Optional[InferenceBackend] = None
@@ -163,7 +167,8 @@ class Dripper:
             logger.warning(f"Model path does not exist: {config['model_path']}")
 
         # Validate tensor parallel size
-        tp = config.get('tp', 1)
+        tp = config.get('model_init_kwargs', {}).get('tensor_parallel_size', 1)
+
         if not isinstance(tp, int) or tp < 1:
             raise DripperConfigError(
                 'tp (tensor parallel size) must be a positive integer'
@@ -208,7 +213,16 @@ class Dripper:
                 logger.info(f'Loading model: {self.model_path}')
                 if self.inference_backend == 'vllm':
                     self._llm = VLLMInferenceBackend(
-                        model_path=self.model_path, tensor_parallel_size=self.tp,
+                        model_path=self.model_path,
+                        model_init_kwargs=self.model_init_kwargs,
+                        model_gen_kwargs=self.model_gen_kwargs
+                    )
+                elif self.inference_backend == 'transformers':
+                    self._llm = TransformersInferenceBackend(
+                        model_path=self.model_path,
+                        tokenizer=self.get_tokenizer(),
+                        model_init_kwargs=self.model_init_kwargs,
+                        model_gen_kwargs=self.model_gen_kwargs
                     )
                 else:
                     raise DripperConfigError(
