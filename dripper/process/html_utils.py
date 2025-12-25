@@ -5,10 +5,11 @@ This module provides helper functions to convert between HTML strings
 and lxml HtmlElement objects.
 """
 
-from lxml import html
+import html
+from lxml import html as lxmlhtml
 
 
-def html_to_element(html_str: str) -> html.HtmlElement:
+def html_to_element(html_str: str) -> lxmlhtml.HtmlElement:
     """
     Convert HTML string to lxml HtmlElement.
 
@@ -21,7 +22,7 @@ def html_to_element(html_str: str) -> html.HtmlElement:
     Returns:
         Root HtmlElement of the parsed HTML tree
     """
-    parser = html.HTMLParser(
+    parser = lxmlhtml.HTMLParser(
         collect_ids=False,  # Don't collect ID attributes for performance
         encoding='utf-8',
         remove_blank_text=True,  # Remove blank text nodes
@@ -38,11 +39,11 @@ def html_to_element(html_str: str) -> html.HtmlElement:
     ):
         html_str = html_str.encode('utf-8')
 
-    root = html.fromstring(html_str, parser=parser)
+    root = lxmlhtml.fromstring(html_str, parser=parser)
     return root
 
 
-def element_to_html(root: html.HtmlElement, pretty_print=False) -> str:
+def element_to_html(root: lxmlhtml.HtmlElement, pretty_print=False) -> str:
     """
     Convert lxml HtmlElement to HTML string.
 
@@ -55,7 +56,23 @@ def element_to_html(root: html.HtmlElement, pretty_print=False) -> str:
     Returns:
         HTML string representation of the element tree
     """
-    html_str = html.tostring(
+    html_str = lxmlhtml.tostring(
         root, pretty_print=pretty_print, encoding='utf-8'
     ).decode()
     return html_str
+
+
+def element_to_html_unescaped(element: lxmlhtml.HtmlElement) -> str:
+    """
+    Convert lxml HtmlElement to HTML string without escaping.
+
+    Serializes an lxml HtmlElement tree back to an HTML string without escaping.
+
+    Args:
+        element: lxml.html.HtmlElement
+
+    Returns:
+        HTML string representation of the element tree
+    """
+    s = element_to_html(element)
+    return html.unescape(s)

@@ -10,7 +10,7 @@ from typing import Callable
 from lxml import html
 
 from dripper.base import ITEM_ID_ATTR, TAIL_BLOCK_TAG, TagType
-from dripper.process.html_utils import element_to_html, html_to_element
+from dripper.process.html_utils import element_to_html_unescaped, html_to_element
 
 
 def remove_recursive_by_condition(
@@ -85,4 +85,4 @@ def extract_main_html(map_html: str, response: dict) -> str:
     for tail_block in root.xpath(f'//{TAIL_BLOCK_TAG}'):
         tail_block.drop_tag()
 
-    return element_to_html(root)
+    return element_to_html_unescaped(root)
