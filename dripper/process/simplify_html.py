@@ -12,6 +12,7 @@ from typing import Dict, List, Tuple
 
 from bs4 import BeautifulSoup
 from lxml import etree, html
+from selectolax.parser import HTMLParser
 
 # Inline tags that should be treated as inline elements
 inline_tags = {
@@ -21,6 +22,16 @@ inline_tags = {
     'button', 'a', 'font', 'dfn', 'sup', 'kbd', 'q', 'script', 'acronym', 'option', 'img', 'big', 'cite',
     'em', 'marked-tail', 'marked-text'
     # 'td', 'th'  # Commented out: table cells are handled specially
+}
+
+# Regarded as block level elements, there are no block level elements inside by default
+no_block_tags = {
+    "math"
+}
+
+# Labels that do not calculate text length
+no_calc_text_tags = {
+    "math", "table"
 }
 
 # Tags to remove from HTML (navigation, metadata, etc.)
@@ -198,6 +209,8 @@ def extract_paragraphs(
     def is_block_element(node) -> bool:
         """Determine if a node is a block-level element."""
         # Handle special case for table cells
+        if node.tag in no_block_tags:
+            return False
         if node.tag in ('td', 'th'):
             # Find the nearest ancestor table element
             table_ancestor = node
@@ -221,6 +234,8 @@ def extract_paragraphs(
 
     def has_block_children(node) -> bool:
         """Determine if a node has block-level children."""
+        if node.tag in no_block_tags:
+            return False
         return any(is_block_element(child) for child in node.iterchildren())
 
     def clone_structure(
@@ -706,64 +721,179 @@ def remove_specific_elements(element):
     if should_remove_element(element):
         parent = element.getparent()
         if parent is not None:
+            # parent.remove(element)
+            tail_text = element.tail or ""
+            element.tail = None
+
+            prev_sibling = element.getprevious()
+            if prev_sibling is not None:
+                if prev_sibling.tail is not None:
+                    prev_sibling.tail += tail_text
+                else:
+                    if prev_sibling.text is not None:
+                        prev_sibling.text += tail_text
+                    else:
+                        prev_sibling.text = tail_text
+            else:
+                if parent.text is not None:
+                    parent.text += tail_text
+                else:
+                    parent.text = tail_text
+
             parent.remove(element)
 
-
-def truncate_text_content(element, max_length=500):
+def truncate_html_element_selective(element, max_length, ellipsis='...', exclude_tags=None):
     """
-    Recursively process text content of element and its children.
+    Truncate the text content within the lxml element and exclude the text within the specified label from being included in the length limit,
+    But the tail outside the specified label is included in the length limit, and an ellipsis is added after the text of the length limit,
+    And ensure that ellipses are not inserted inside the excluded labels.
 
-    Truncates when total length exceeds max_length while keeping tag structure intact.
+    params:
+        element (lxml.etree.Element): The lxml elements to be processed
+        max_length (int): Maximum allowed text length (excluding the length of specified labels)
+        ellipsis (str): The omitted symbol added after truncation defaults to '...'
+        exclude_tags (list): List of label names not included in length statistics, such as ['math ',' script ',' style ']
 
-    Args:
-        element: HTML element to process
-        max_length: Maximum total text length allowed
+    return:
+        lxml.etree.Element: Processed elements
     """
-    # First collect all text nodes (including text and tail)
-    text_nodes = []
+    if exclude_tags is None:
+        exclude_tags = set()
 
-    # Collect element's text
-    if element.text and element.text.strip():
-        text_nodes.append(('text', element, element.text))
+    def _calculate_text_length(node):
+        """Calculate the effective text length of the node and its descendants (excluding text within the specified label)"""
+        total_length = 0
 
-    # Recursively process child elements
-    for child in element:
-        truncate_text_content(child, max_length)
-        # Collect child's tail
-        if child.tail and child.tail.strip():
-            text_nodes.append(('tail', child, child.tail))
+        if node.text and not _is_excluded(node):
+            total_length += len(node.text)
 
-    # Calculate total text length under current element
-    total_length = sum(len(text) for (typ, node, text) in text_nodes)
+        for child in node:
+            total_length += _calculate_text_length(child)
 
-    # If total length doesn't exceed limit, return directly
-    if total_length <= max_length:
-        return
+        if node.tail:
+            total_length += len(node.tail)
+        return total_length
 
-    # Otherwise perform truncation
-    remaining = max_length
-    for typ, node, text in text_nodes:
-        if remaining <= 0:
-            # Already reached limit, clear remaining text content
-            if typ == 'text':
-                node.text = None
+    def _is_excluded(node):
+        """Check if the node or its ancestor node is in the exclusion list"""
+        current = node
+        while current is not None:
+            if current.tag in exclude_tags:
+                return True
+            current = current.getparent()
+        return False
+
+    current_length = [0]
+    ellipsis_added = [False]
+    nodes_to_process = []
+
+    def _collect_text_nodes(node):
+        """
+        Recursive collection of all text node information that needs to be processed (including text and tail)
+        Simultaneously mark whether the node is allowed to be modified (not included in the exclusion label)
+        """
+        if node.text and not _is_excluded(node):
+            nodes_to_process.append({
+                'type': 'text',
+                'node': node,
+                'original_text': node.text,
+                'can_modify': not _is_inside_excluded_tag(node)
+            })
+
+        for child in node:
+            _collect_text_nodes(child)
+
+        if node.tail:
+            nodes_to_process.append({
+                'type': 'tail',
+                'node': node,
+                'original_text': node.tail,
+                'can_modify': not _is_inside_excluded_tag(node)
+            })
+
+    def _is_inside_excluded_tag(node):
+        """Check if the node is located inside the excluded label"""
+        return _is_excluded(node.getparent()) if node.getparent() is not None else False
+
+    def _process_text_nodes():
+        """Process the collected text nodes, perform truncation and ellipsis addition"""
+        for node_info in nodes_to_process:
+            if ellipsis_added[0]:
+                if node_info['type'] == 'text':
+                    node_info['node'].text = None
+                else:
+                    node_info['node'].tail = None
+                continue
+
+            text_len = len(node_info['original_text'])
+            if current_length[0] + text_len <= max_length:
+                current_length[0] += text_len
             else:
-                node.tail = None
-            continue
+                if node_info['can_modify']:
+                    remaining = max_length - current_length[0]
+                    truncated_text = node_info['original_text'][:remaining] + ellipsis
 
-        if len(text) > remaining:
-            # Need to truncate this text node
-            if typ == 'text':
-                node.text = text[:remaining] + '...'
-            else:
-                node.tail = text[:remaining] + '...'
-            remaining = 0
-        else:
-            remaining -= len(text)
+                    if node_info['type'] == 'text':
+                        node_info['node'].text = truncated_text
+                    else:
+                        node_info['node'].tail = truncated_text
 
+                    current_length[0] = max_length
+                    ellipsis_added[0] = True
+
+                    _mark_truncation_point(node_info['node'])
+                else:
+                    current_length[0] += text_len
+
+    def _mark_truncation_point(truncate_node):
+        """Mark truncation points and clean up subsequent content"""
+        parent = truncate_node.getparent()
+        if parent is not None:
+            children = list(parent)
+            try:
+                index = children.index(truncate_node)
+                for sibling in children[index + 1:]:
+                    parent.remove(sibling)
+            except ValueError:
+                pass
+
+        _clean_ancestors_following_siblings(truncate_node)
+
+    def _clean_ancestors_following_siblings(node):
+        """Recursively clean up the subsequent sibling nodes of all ancestor nodes"""
+        parent = node.getparent()
+        if parent is None:
+            return
+
+        grandparent = parent.getparent()
+        if grandparent is None:
+            return
+
+        children = list(grandparent)
+        try:
+            index = children.index(parent)
+            for sibling in children[index + 1:]:
+                grandparent.remove(sibling)
+        except ValueError:
+            pass
+
+        _clean_ancestors_following_siblings(parent)
+
+    # 1. First, calculate the total text length
+    total_text_length = _calculate_text_length(element)
+
+    # 2. If the total length does not exceed the limit, return directly
+    if total_text_length <= max_length:
+        return element
+
+    # 3. Collect and process text nodes
+    _collect_text_nodes(element)
+    _process_text_nodes()
+
+    return element
 
 def process_paragraphs(
-    paragraphs: List[Dict[str, str]], uid_map: Dict[str, html.HtmlElement]
+    paragraphs: List[Dict[str, str]], uid_map: Dict[str, html.HtmlElement], cutoff_length: int = 500
 ) -> Tuple[str, html.HtmlElement]:
     """
     Process paragraphs and add _item_id attributes.
@@ -800,7 +930,7 @@ def process_paragraphs(
                 continue
 
             # Truncate overly long text content
-            truncate_text_content(root, max_length=200)
+            truncate_html_element_selective(root, max_length=cutoff_length, exclude_tags=no_calc_text_tags)
 
             # Add same _item_id to current paragraph and original element
             current_id = str(item_id)
@@ -978,7 +1108,7 @@ def process_paragraphs(
     return post_process_html(simplified_html)
 
 
-def simplify_html(html_str: str) -> Tuple[str, str]:
+def simplify_html(html_str: str, cutoff_length: int = 500) -> Tuple[str, str]:
     """
     Simplify HTML structure and add item IDs.
 
@@ -997,8 +1127,13 @@ def simplify_html(html_str: str) -> Tuple[str, str]:
     preprocessed_html = remove_xml_declaration(html_str)
 
     # Fix unclosed tags using BeautifulSoup (lxml cannot fully fix them)
-    soup = BeautifulSoup(preprocessed_html, 'html.parser')
-    fixed_html = str(soup)
+    # Prioritize using Selectolax for better performance
+    try:
+        soup = HTMLParser(preprocessed_html)
+        fixed_html = soup.html
+    except Exception:
+        soup = BeautifulSoup(preprocessed_html, 'html.parser')
+        fixed_html = str(soup)
 
     # Parse original DOM
     original_dom = html.fromstring(fixed_html)
@@ -1017,7 +1152,7 @@ def simplify_html(html_str: str) -> Tuple[str, str]:
     )
 
     # Process paragraphs (synchronously add IDs)
-    simplified_html = process_paragraphs(paragraphs, original_uid_map)
+    simplified_html = process_paragraphs(paragraphs, original_uid_map, cutoff_length)
 
     remove_all_uids(original_dom)
     original_html = etree.tostring(
