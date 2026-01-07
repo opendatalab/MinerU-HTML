@@ -1,3 +1,4 @@
+selectolax
 beautifulsoup4
 fastapi
 html2text

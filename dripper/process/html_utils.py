@@ -5,6 +5,7 @@ This module provides helper functions to convert between HTML strings
 and lxml HtmlElement objects.
 """
 
+import re
 import html
 from lxml import html as lxmlhtml
 
@@ -76,3 +77,19 @@ def element_to_html_unescaped(element: lxmlhtml.HtmlElement) -> str:
     """
     s = element_to_html(element)
     return html.unescape(s)
+
+
+def decode_http_urls_only(html_str):
+    """do not escape the url"""
+    def decode_match(match):
+        prefix = match.group(1)  # href=" 或 src="
+        url = match.group(2)
+        suffix = match.group(3)  # "
+
+        if url.startswith(('http://', 'https://', 'ftp://', '//')):
+            decoded_url = html.unescape(url)
+            return f'{prefix}{decoded_url}{suffix}'
+        return match.group(0)
+
+    pattern = r'(href="|src=")(.*?)(")'
+    return re.sub(pattern, decode_match, html_str, flags=re.IGNORECASE | re.DOTALL)
