@@ -1,0 +1,9 @@
+accelerate
+beautifulsoup4
+lxml
+mineru_webkit
+pytest
+pytest-asyncio
+selectolax
+trafilatura
+transformers

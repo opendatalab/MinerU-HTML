@@ -1,63 +1,74 @@
-# MinerU-HTML(Dripper)
+# MinerU-HTML
 
-**MinerU-HTML(Dripper)** is an advanced HTML main content extraction tool based on Large Language Models (LLMs). It provides a complete pipeline for extracting primary content from HTML pages using LLM-based classification and state machine-guided generation.
+English/[中文](README_zh.md)
+
+**MinerU-HTML** is an advanced HTML main content extraction tool based on Small Language Models (SLM). It can accurately identify and extract main content from complex web page HTML, automatically filtering out auxiliary elements such as navigation bars, advertisements, and metadata.
+
+[**Try on our website -> Mineru-Extractor**](https://mineru.net/OpenSourceTools/Extractor)
+
+Welcome to try our online document extraction tool! Supports HTML main content extraction and OCR for various document formats.
+
+OR
+
+[**Download the model for local usage -> MinerU-HTML-v1.1**](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact) —— Now updated to v1.1 !
 
 ## News
 
-- 2025.12.1 🎉 The [AICC](https://huggingface.co/datasets/opendatalab/AICC) dataset is released, welcome to use! AICC dataset contains 7.3T web pages extracted and converted to Markdown format by MinerU-HTML(Dripper), with cleaner main content and high-quality code, formulas, and tables.
+- 2026.03.19 🎉 The [MinerU-HTML-v1.1](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact) is released! A more efficient and powerful version than v1.0, now integrated with [MinerU-Webkit](https://github.com/opendatalab/MinerU-Webkit) for HTML-to-Markdown/JSON/Txt conversion. Welcome to use!
+- 2025.12.1 🎉 The [AICC](https://huggingface.co/datasets/opendatalab/AICC) dataset is released, welcome to use! AICC dataset contains 7.3T web pages extracted and converted to Markdown format by MinerU-HTML, with cleaner main content and high-quality code, formulas, and tables.
 - 2025.12.1 🎉 The [MinerU-HTML](https://huggingface.co/opendatalab/MinerU-HTML) model is released, welcome to use! MinerU-HTML model is a fine-tuned model on Qwen3, with better performance on HTML main content extraction.
 - 2025.12.1 🎉 The trial page is online, welcome to visit [Opendatalab-AICC](https://opendatalab.com/ai-ready/AICC#playground) to try our extraction tool!
 
-## Features
+## ✨ Features
 
-- 🚀 **LLM-Powered Extraction**: Uses state-of-the-art language models to intelligently identify main content
-- 🎯 **State Machine Guidance**: Implements logits processing with state machines for structured JSON output
-- 🔄 **Fallback Mechanism**: Automatically falls back to alternative extraction methods on errors
-- 📊 **Comprehensive Evaluation**: Built-in evaluation framework with ROUGE
-- 🌐 **REST API Server**: FastAPI-based server for easy integration
-- ⚡ **Distributed Processing**: Ray-based parallel processing for large-scale evaluation
-- 🔧 **Multiple Extractors**: Supports various baseline extractors for comparison
+- 🎯 **LLM-Powered Extraction**: Uses state-of-the-art language models to intelligently identify main content
+- 📝 **Extensible Output**: Integrated with [MinerU-Webkit](https://github.com/opendatalab/MinerU-Webkit) to support efficient conversion of extracted HTML into Markdown, JSON and Txt.
+- ⚡ **Compact Format**: Now use compact format for the model instead of the original JSON format for faster inference speed
+- ⚡ **Regex structured output**: Now use regex structured output for the model instead of the custom logits processor, so we can use vLLM v1 backend for inference.
+- 🔄 **Complete Processing Pipeline**: Includes HTML simplification, prompt construction, LLM inference, result parsing, main content extraction, and other complete processes
+- 🚀 **Multiple Inference Backend Support**: Supports three inference backends: VLLM, Transformers, and OpenAI API
+- 🛡️ **Fault Tolerance**: Supports fallback mechanism (trafilatura, bypass or empty) to ensure content extraction even when processing fails
+- 🔌 **Modular Design**: Clear architecture design, easy to extend and customize
+- 🧪 **Complete Testing**: Includes comprehensive unit tests and integration tests
 
 ## Evaluation Results
 
-We evaluated MinerU-HTML on the [WebMainBench](https://github.com/opendatalab/WebMainBench/) benchmark, which contains 7,887 meticulously annotated web pages along with their corresponding Markdown-formatted main content converted using `html2text`. This benchmark measures the extraction accuracy of content extractors by computing ROUGE-N scores between the extracted results and ground-truth content. The primary evaluation results are presented in the table below:
+We evaluated MinerU-HTML on the [WebMainBench v1.1](https://github.com/opendatalab/WebMainBench/) benchmark, which contains 7,809 (7,887 for v1.0, we removed some low quality web pages) meticulously annotated web pages along with their corresponding Markdown-formatted main content converted using `html2text`. This benchmark measures the extraction accuracy of content extractors by computing ROUGE-N scores between the extracted results and ground-truth content. The primary evaluation results are presented in the table below:
 
-| Extractor                | ROUGE-N.f1 |
-| ------------------------ | ---------- |
-| MinerU-HTML              | 0.8399     |
-| GPT-5\*                  | 0.8302     |
-| DeepSeek-V3\*            | 0.8252     |
-| MinerU-HTML(no fallback) | 0.8182     |
-| Magic-HTML               | 0.7091     |
-| Readability              | 0.6491     |
-| Trafilatura              | 0.6358     |
-| Resiliparse              | 0.6233     |
-| html2text                | 0.5977     |
-| BoilerPy3                | 0.5413     |
-| GNE                      | 0.5148     |
-| news-please              | 0.5012     |
-| justText                 | 0.4770     |
-| BoilerPy3                | 0.4766     |
-| Goose3                   | 0.4354     |
-| ReaderLM-v2              | 0.2264     |
+| Extractor        | ROUGE-N.f1 |
+| ---------------- | ---------- |
+| DeepSeek-V3\*    | 0.9098     |
+| GPT-5\*          | 0.9024     |
+| MinerU-HTML-v1.1 | 0.9001     |
+| Magic-HTML       | 0.7138     |
+| Readability      | 0.6542     |
+| Trafilatura      | 0.6402     |
+| Resiliparse      | 0.6290     |
+| html2text        | 0.6042     |
+| BoilerPy3        | 0.5434     |
+| GNE              | 0.5171     |
+| news-please      | 0.5032     |
+| justText         | 0.4782     |
+| Goose3           | 0.4371     |
+| ReaderLM-v2      | 0.2279     |
 
 where * denotes that use GPT-5/Deepseek-V3 to extract the main html in MinerU-HTML framework instead of our finetuned model.
 
-## Installation
+## 🚀 Quick Start
 
-### Prerequisites
+### Download the model
 
-- Python >= 3.10
-- CUDA-capable GPU (recommended for LLM inference)
-- Sufficient memory for model loading
+visit our model at [MinerU-HTML-v1.1-compact](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact) and download the model, you can use the following command to download the model:
 
-### Install from Source
+```bash
+huggingface-cli download opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact
+```
 
-The installation process automatically handles dependencies. The `setup.py` reads dependencies from `requirements.txt` and optionally from `baselines.txt`.
+### Installation
 
 #### Basic Installation (Core Functionality)
 
-For basic usage of Dripper, install with core dependencies only:
+For basic usage of MinerU-HTML, clone the repository and install with core dependencies only:
 
 ```bash
 # Clone the repository
@@ -65,193 +76,245 @@ git clone https://github.com/opendatalab/MinerU-HTML
 cd MinerU-HTML
 
 # Install the package with core dependencies only
-# Dependencies from requirements.txt are automatically installed
 pip install .
 ```
 
-#### Installation with Baseline Extractors (for Evaluation)
+#### Install Specific Backend Dependencies
 
-If you need to run baseline evaluations and comparisons, install with the `baselines` extra:
-
-```bash
-# Install with baseline extractor dependencies
-pip install -e .[baselines]
-```
-
-This will install additional libraries required for baseline extractors:
-
-- `magic-html` - CPU only HTML extraction tool, also from **OpenDatalab**
-- `readabilipy`, `readability_lxml` - Readability-based extractors
-- `resiliparse` - Resilient HTML parsing
-- `justext` - JustText extractor
-- `gne` - General News Extractor
-- `goose3` - Goose3 article extractor
-- `boilerpy3` - Boilerplate removal
-- `crawl4ai` - AI-powered web content extraction
-
-**Note**: The baseline extractors are only needed for running comparative evaluations. For basic usage of Dripper, the core installation is sufficient.
-
-## Quick Start
-
-### 1. Download the model
-
-visit our model at [MinerU-HTML](https://huggingface.co/opendatalab/MinerU-HTML) and download the model, you can use the following command to download the model:
+Depending on your use case, you can choose to install different backend dependencies:
 
 ```bash
-huggingface-cli download opendatalab/MinerU-HTML
+# Install VLLM backend dependencies (Default)
+pip install .[vllm]
+
+# Install OpenAI backend dependencies
+pip install .[openai]
+
+# Install all dependencies
+pip install .[all]
 ```
 
-### 2. Using the Python API
+### Basic Usage
+
+#### Default Usage (VLLM Backend on GPU)
 
 ```python
-from dripper.api import Dripper
+from mineru_html import MinerUHTML, MinerUHTMLConfig
 
-# Initialize Dripper with model configuration
-dripper = Dripper(
-    config={
-        'model_path': '/path/to/your/model',
-        'use_fall_back': True,
-        'raise_errors': False,
-        'inference_backend': "vllm",
-        "model_init_kwargs": {
-          'tensor_parallel_size': 1,  # Tensor parallel size
-        },
-        "model_gen_kwargs": {
-          'temperature': 0.0,
-        },
+
+config = MinerUHTMLConfig(
+    use_fall_back='trafilatura',    # optional 'trafilatura','bypass' or 'empty'
+    prompt_version='short_compact', # only support 'short_compact' for v1.1
+    response_format='compact',      # only support 'compact' for v1.1
+    early_load=True
+)
+
+# initialize MinerUHTML
+extractor = MinerUHTML(
+    model_path='path/to/your/model',
+    config=config
+)
+
+# process single HTML
+html_content = '<html>...</html>'
+result = extractor.process(html_content)
+print(result[0].main_content)
+
+# process multi HTML
+html_list = ['<html>...</html>', '<html>...</html>']
+results = extractor.process(html_list)
+for result in results:
+    print(result.main_content)
+    print(result.case_id)
+extractor.llm.cleanup()
+```
+
+#### Using Transformers Backend
+
+```python
+from mineru_html import MinerUHTML_Transformers, MinerUHTMLConfig
+
+config = MinerUHTMLConfig(
+    use_fall_back='trafilatura',
+    prompt_version='short_compact',  # only support 'short_compact' for v1.1
+    response_format='compact',       # only support 'compact' for v1.1
+    early_load=True
+)
+
+# initialize MinerUHTML_Transformers
+extractor = MinerUHTML_Transformers(
+    model_path='path/to/your/model',
+    config=config,
+    model_init_kwargs={
+        'device_map': 'auto',
+        'dtype': 'auto',
+    },
+    model_gen_kwargs={
+        'max_new_tokens': 16 * 1024,
     }
 )
 
-# Extract main content from HTML
-html_content = """
-<html>
-  <body>
-    <div>
-    <h1>This is a title</h1>
-    <p>This is a paragraph</p>
-    <p>This is another paragraph</p>
-    </div>
-    <div>
-    <p>Related content</p>
-    <p>Advertising content</p>
-    </div>
-  </body>
-</html>
-"""
-result = dripper.process(html_content)
-
-# Access results
-main_html = result[0].main_html
+# process HTML
+html_content = '<html>...</html>'
+result = extractor.process(html_content)
+print(result[0].main_content)
 ```
 
-### 3. Using the REST API Server
+## 📖 Core Concepts
 
-```bash
-# Start the server
-python -m dripper.server \
-    --model_path /path/to/your/model \
-    --port 7986
+### Processing Pipeline
 
-# Or use environment variables
-export DRIPPER_MODEL_PATH=/path/to/your/model
-export DRIPPER_PORT=7986
-python -m dripper.server
-```
+The MinerU-HTML processing pipeline includes the following steps:
 
-Then make requests to the API:
+1. **HTML Simplification** (`simplify_html`): Simplifies raw HTML into a structured format, assigning a unique `_item_id` attribute to each element
+2. **Prompt Construction** (`build_prompt`): Constructs LLM prompts based on simplified HTML to guide the model in content classification
+3. **LLM Inference** (`inference`): Uses LLM to classify each element, marking them as "main" (main content) or "other" (auxiliary content)
+4. **Result Parsing** (`parse_result`): Parses the classification results returned by LLM
+5. **Main Content Extraction** (`extract_main_html`): Extracts main content from original HTML based on classification results
+6. **Format Conversion** (`convert2content`): Transform extracted HTML into Markdown, JSON and Txt.
+7. **Fallback Processing**: If the above process fails, uses fallback mechanism (trafilatura, bypass or empty) for content extraction
 
-```bash
-# Extract main content
-curl -X POST "http://localhost:7986/extract" \
-  -H "Content-Type: application/json" \
-  -d '{"html": "<html><body>Hello World</body></html>", "url": "https://example.com"}'
+### Configuration Options
 
-# Health check
-curl http://localhost:7986/health
-```
+`MinerUHTMLConfig` supports the following configurations:
 
-## Configuration
+- `use_fall_back`: Fallback type, optional `'trafilatura'`, `'bypass'`, or `'empty'`
+- `early_load`: Whether to load the model early (default `True`)
+- `prompt_version`: Prompt version, optional `'v0'`, `'v1'`, `'v2'`, `'compact'`, `'short_compact'`. The MinerUHTML and MinerUHTML_Transformers interfaces default to `'short_compact'`; the MinerUHTML_OpenAI interface defaults to `'v2'`
+- `response_format`: The output format of the model. Only `'json'` or `'compact'` are permitted. VLLM/Transformers defaults to `'compact'`; OpenAI defaults to `'json'`
+- `output_format`: The target format for Format Conversion, supporting `'mm_md'` (standard Markdown), `'md'` (Markdown with images), `'json'` and `'txt'`
 
-### Dripper Configuration Options
+#### Usage instructions for different prompt_version
 
-| Parameter           | Type | Default      | Description                                    |
-| ------------------- | ---- | ------------ | ---------------------------------------------- |
-| `model_path`        | str  | **Required** | Path to the LLM model directory                |
-| `state_machine`     | str  | None         | State machine version                          |
-| `use_fall_back`     | bool | True         | Enable fallback to trafilatura on errors       |
-| `raise_errors`      | bool | False        | Raise exceptions on errors (vs returning None) |
-| `debug`             | bool | False        | Enable debug logging                           |
-| `early_load`        | bool | False        | Load model during initialization               |
-| `inference_backend` | str  | `vllm`       | The inference backend you want to use          |
-| `model_init_kwargs` | dict | `{}`         | Parameters used during model initialization    |
-| `model_gen_kwargs`  | dict | `{}`         | Parameters used during model inference         |
+- `'compact'`: Used for local model inference, it returns more concise results (only keeping the key and value in the JSON dictionary). It is recommended to use the `'compact'` model for faster inference speed.
+- `'v2'`: Used for OpenAI API inference, it is the result after prompt optimization.
 
-### Environment Variables
+## 🔧 Advanced Usage
 
-- `DRIPPER_MODEL_PATH`: Path to the LLM model
-- `DRIPPER_STATE_MACHINE`: State machine version (default:None)
-- `DRIPPER_PORT`: Server port number (default: 7986)
-- `VLLM_USE_V1`: Must be set to `'0'` when using state machine
-- `INFERENCE_BACKEND`: Inference backend to use (default `vllm`)
-- `MODEL_INIT_KWARGS`: JSON string of model initialization kwargs (default `{}`)
-- `MODEL_GEN_KWARGS`: JSON string of model inference kwargs (default `{}`)
+### Using Factory Functions to Create Backends
 
-## Usage Examples
-
-### Batch Processing
+You can also directly use factory functions to create backends and then pass them to `MinerUHTMLGeneric`:
 
 ```python
-from dripper.api import Dripper
+from mineru_html import MinerUHTMLGeneric, MinerUHTMLConfig
+from mineru_html.inference.factory import create_vllm_backend, create_transformers_backend
 
-dripper = Dripper(config={'model_path': '/path/to/model'})
+# Create VLLM backend using factory function
+llm = create_vllm_backend(
+    model_path='path/to/model',
+    response_format='compact',
+    max_context_window=32 * 1024,
+    model_init_kwargs={'tensor_parallel_size': 1}
+)
 
-# Process multiple HTML strings
-html_list = ["<html><body>Hello,</body></html>", "<html><body>World!</body></html>"]
-results = dripper.process(html_list)
+# Create Transformers backend using factory function
+llm = create_transformers_backend(
+    model_path='path/to/model',
+    max_context_window=32 * 1024,
+    response_format='compact',
+    model_init_kwargs={
+        'device_map': 'auto',
+        'dtype': 'auto',
+    },
+    model_gen_kwargs={
+        'max_new_tokens': 8192,
+    }
+)
 
-for result in results:
-    print(result.main_html)
+# Use the created backend
+config = MinerUHTMLConfig()
+extractor = MinerUHTMLGeneric(llm=llm, config=config)
 ```
 
-## Supported Extractors
+### Error Handling
 
-Dripper supports various baseline extractors for comparison:
+```python
+from mineru_html.exceptions import MinerUHTMLError
 
-- [**Dripper**](https://opendatalab.com/ai-ready/AICC#playground) (`dripper-md`, `dripper-html`): The main LLM-based extractor
+try:
+    result = extractor.process(html_content)
+except MinerUHTMLError as e:
+    print(f"Processing failed: {e}")
+    print(f"Case ID: {e.case_id}")
+```
 
-- [**Magic-HTML**](https://github.com/opendatalab/magic-html): CPU only HTML extraction tool, also from **OpenDatalab**
+## Baselines evaluation
 
-- [**Trafilatura**](https://github.com/adbar/trafilatura): Fast and accurate content extraction
+To run the evaluation, you need to install the dependencies in `baselines.txt` first.
 
-- [**Readability**](https://github.com/mozilla/readability): Mozilla's readability algorithm
+```bash
+pip install -r baselines.txt
+```
 
-- [**BoilerPy3**](https://github.com/jmriebold/BoilerPy3): Python port of Boilerpipe
+Then you can use the following command:
 
-- [**NewsPlease**](https://github.com/fhamborg/news-please): News article extractor
+```bash
 
-- [**Goose3**](https://github.com/goose3/goose3): Article extractor
+BENCHMARK_DATA=benchmark/WebMainBench_100.jsonl
+RESULT_DIR=benchmark_results
+mkdir $RESULT_DIR
 
-- [**GNE**](https://github.com/GeneralNewsExtractor/GeneralNewsExtractor): General News Extractor
+# For MinerU-HTML
+EXTRACTORS=(
+"mineru_html_fallback-html-md"
+)
+MODEL_PATH=YOUR_MINERUHTML_MODEL_PATH
 
-- [**ReaderLM**](https://huggingface.co/jinaai/ReaderLM-v2): LLM-based text extractor
+for extractor in ${EXTRACTORS[@]}; do
+    python eval_baselines.py --bench $BENCHMARK_DATA --task_dir $RESULT_DIR/$extractor --extractor_name  $extractor --model_path $MODEL_PATH --default_config gpu
+done
 
-- [**Crawl4ai**](https://github.com/unclecode/crawl4ai): AI-powered web content extraction
+# For CPU Extractors
+EXTRACTORS=(
+"magichtml-html-md"
+"readability-html-md"
+"trafilatura-html-md"
+"resiliparse-text"
+"trafilatura-md"
+"trafilatura-text"
+"fullpage-html-md"
+"boilerpy3-text"
+"gne-html-md"
+"newsplease-text"
+"justtext-text"
+"boilerpy3-html-md"
+"goose3-text"
+)
 
-- And more...
+for extractor in ${EXTRACTORS[@]}; do
+    python eval_baselines.py --bench $BENCHMARK_DATA --task_dir $RESULT_DIR/$extractor --extractor_name $extractor
+done
+
+# For ReaderLM
+extractor=readerlm-text
+MODEL_PATH=YOUR_READERLM_MODEL_PATH
+
+python eval_baselines.py --bench $BENCHMARK_DATA --task_dir $RESULT_DIR/$extractor --extractor_name  $extractor --model_path $MODEL_PATH --default_config gpu
+```
+
+MinerU-HTML supports various baseline extractors for comparison:
+  - [**MinerU-HTML**](https://opendatalab.com/ai-ready/AICC#playground) (`mineru_html-html-md`, `mineru_html-html-text`): The main LLM-based extractor
+
+  - [**Magic-HTML**](https://github.com/opendatalab/magic-html): CPU only HTML extraction tool, also from **OpenDatalab**
+
+  - [**Trafilatura**](https://github.com/adbar/trafilatura): Fast and accurate content extraction
+
+  - [**Readability**](https://github.com/mozilla/readability): Mozilla's readability algorithm
+
+  - [**BoilerPy3**](https://github.com/jmriebold/BoilerPy3): Python port of Boilerpipe
+
+  - [**NewsPlease**](https://github.com/fhamborg/news-please): News article extractor
+
+  - [**Goose3**](https://github.com/goose3/goose3): Article extractor
+
+  - [**GNE**](https://github.com/GeneralNewsExtractor/GeneralNewsExtractor): General News Extractor
+
+  - [**ReaderLM**](https://huggingface.co/jinaai/ReaderLM-v2): LLM-based text extractor
+
 
 ## License
 
-This project is licensed under the Apache License, Version 2.0. See the [LICENCE](LICENCE) file for details.
-
-### Copyright Notice
-
-This project contains code and model weights derived from Qwen3. Original Qwen3 Copyright 2024 Alibaba Cloud, licensed under Apache License 2.0. Modifications and additional training Copyright 2025 OpenDatalab Shanghai AILab, licensed under Apache License 2.0.
-
-For more information, please see the [NOTICE](NOTICE) file.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+This project is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for details.
 
 ## Citation
 
@@ -287,6 +350,6 @@ If you use the extracted [AICC](https://huggingface.co/datasets/opendatalab/AICC
 
 - Built on top of [vLLM](https://github.com/vllm-project/vllm) for efficient LLM inference
 - Uses [Trafilatura](https://github.com/adbar/trafilatura) for fallback extraction
-- Finetuned on [Qwen3](https://github.com/QwenLM/Qwen3)
+- Finetuned on [Hunyuan](https://github.com/Tencent-Hunyuan/Hunyuan-0.5B)
 - Inspired by various HTML content extraction research
 - Pairwise win rates LLM-as-a-judge by [dingo](https://github.com/MigoXLab/dingo)

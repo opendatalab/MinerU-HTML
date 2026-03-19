@@ -1,50 +1,44 @@
-"""
-Simplified setup.py - A balanced version with essential improvements.
-"""
-
 from pathlib import Path
 
 from setuptools import find_packages, setup
 
 
-def read_requirements(file_path: Path) -> list[str]:
-    """
-    Read requirements from a file and return as a list.
-
-    Args:
-        file_path: Path to the requirements file
-
-    Returns:
-        List of requirement strings
-    """
-    if not file_path.exists():
+def read_requirements(file_path: str) -> list[str]:
+    """Read a requirements file and return a list of dependency strings."""
+    req_file = Path(__file__).parent / 'requirements' / file_path
+    if not req_file.exists():
         return []
-    with open(file_path, 'r', encoding='utf-8') as f:
-        return [
-            line.strip()
-            for line in f
-            if line.strip() and not line.startswith('#')
-        ]
+
+    requirements = []
+    with open(req_file, 'r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            # Skip empty lines and comments
+            if line and not line.startswith('#'):
+                requirements.append(line)
+    return requirements
 
 
-# Read main requirements
-requirements_file = Path(__file__).parent / 'requirements.txt'
-install_requires = read_requirements(requirements_file)
+# Core dependencies
+core_requirements = read_requirements('core.txt')
+openai_requirements = read_requirements('openai.txt')
+vllm_requirements = read_requirements('vllm.txt')
 
-# Read baseline requirements (optional dependencies for evaluation)
-baselines_file = Path(__file__).parent / 'baselines.txt'
-baselines_requires = read_requirements(baselines_file)
+# Base install includes only core dependencies
+install_requires = core_requirements
+
+# Optional dependency groups
+extras_require = {
+    'openai': openai_requirements,
+    'vllm': vllm_requirements,
+    'all': openai_requirements + vllm_requirements,
+}
 
 setup(
-    name='dripper',
-    version='1.0.0',
-    description='HTML main content extractor based on large language models',
-    packages=find_packages(include=['dripper*']),
+    name='mineru_html',
+    version='1.1.0',
+    packages=find_packages(include=['mineru_html*']),
     include_package_data=True,
-    python_requires='>=3.10',
     install_requires=install_requires,
-    extras_require={
-        'baselines': baselines_requires,
-    },
-    license='Apache License 2.0',
+    extras_require=extras_require,
 )

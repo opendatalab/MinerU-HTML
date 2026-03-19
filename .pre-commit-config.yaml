@@ -1,11 +1,9 @@
-exclude: ^tests/llm_web_kit/extractor/html/magic_html/assets/
-
 repos:
   - repo: https://github.com/PyCQA/flake8
     rev: 5.0.4
     hooks:
       - id: flake8
-        args: [ "--max-line-length=2200", "--ignore=E131,E125,W503,W504,E203,E231,E702,E128,W604" ]
+        args: [ "--max-line-length=2200", "--ignore=E131,E125,W503,W504,E203,E231,E702,E128" ]
   - repo: https://github.com/PyCQA/isort
     rev: 5.11.5
     hooks:
@@ -19,19 +17,15 @@ repos:
   #   rev: v2.2.1
   #   hooks:
   #     - id: codespell
-  #       exclude: '^tests/.*/assets/|llm_web_kit/model/assets/.*'
   #       args: ['--skip', '*.json']
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.3.0
     hooks:
       - id: trailing-whitespace
-        exclude: '^tests/.*/assets/|llm_web_kit/model/assets/.*'
       - id: check-yaml
       - id: end-of-file-fixer
-        exclude: '^tests/.*/assets/|llm_web_kit/model/assets/.*'
       - id: requirements-txt-fixer
       - id: double-quote-string-fixer
-        exclude: '^tests/.*/assets/|llm_web_kit/model/assets/.*'
       - id: check-merge-conflict
       - id: fix-encoding-pragma
         args: [ "--remove" ]
@@ -46,4 +40,3 @@ repos:
           - mdformat-openmmlab
           - mdformat_frontmatter
           - linkify-it-py
-        exclude: '^tests/.*/assets/|llm_web_kit/model/assets/.*'
