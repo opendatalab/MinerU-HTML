@@ -68,7 +68,13 @@ huggingface-cli download opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact
 
 #### 基础安装（核心功能）
 
-如需使用 MinerU-HTML 的基本功能，请克隆仓库并安装核心依赖：
+如需使用 MinerU-HTML 的基本功能，可以使用pip安装（推荐）：
+
+```bash
+pip install mineru_html
+```
+
+或者也可以克隆仓库并安装核心依赖：
 
 ```bash
 # 克隆仓库
@@ -85,13 +91,13 @@ pip install .
 
 ```bash
 # 安装 VLLM 后端依赖（默认）
-pip install .[vllm]
+pip install mineru_html[vllm]
 
 # 安装 OpenAI 后端依赖
-pip install .[openai]
+pip install mineru_html[openai]
 
 # 安装所有依赖
-pip install .[all]
+pip install mineru_html[all]
 ```
 
 ### 基本用法
@@ -118,13 +124,13 @@ extractor = MinerUHTML(
 # 处理单个 HTML
 html_content = '<html>...</html>'
 result = extractor.process(html_content)
-print(result[0].main_content)
+print(result[0].output_data.main_content)
 
 # 批量处理 HTML
 html_list = ['<html>...</html>', '<html>...</html>']
 results = extractor.process(html_list)
 for result in results:
-    print(result.main_content)
+    print(result.output_data.main_content)
     print(result.case_id)
 extractor.llm.cleanup()
 ```
@@ -157,7 +163,7 @@ extractor = MinerUHTML_Transformers(
 # 处理 HTML
 html_content = '<html>...</html>'
 result = extractor.process(html_content)
-print(result[0].main_content)
+print(result[0].output_data.main_content)
 ```
 
 ## 📖 核心概念

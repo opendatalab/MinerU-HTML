@@ -36,8 +36,19 @@ extras_require = {
 
 setup(
     name='mineru_html',
-    version='1.1.0',
+    version='1.1.1',
     packages=find_packages(include=['mineru_html*']),
+    long_description=open('README.md', 'r', encoding='utf-8').read(),
+    long_description_content_type='text/markdown',
+    description="MinerU-HTML is a main content extraction tool based on Small Language Models.",
+    url="https://github.com/opendatalab/MinerU-HTML",
+    project_urls={
+        'Bug Reports': 'https://github.com/opendatalab/MinerU-HTML/issues',
+        'Source': 'https://github.com/opendatalab/MinerU-HTML',
+        'Model': 'https://huggingface.co/collections/opendatalab/mineru-html',
+    },
+    license='Apache License 2.0',
+    keywords=['HTML', 'html2text', 'news-crawler' ,'text-extraction', 'scraper', 'webscraping'],
     include_package_data=True,
     install_requires=install_requires,
     extras_require=extras_require,

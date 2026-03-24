@@ -68,7 +68,13 @@ huggingface-cli download opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact
 
 #### Basic Installation (Core Functionality)
 
-For basic usage of MinerU-HTML, clone the repository and install with core dependencies only:
+For basic usage of MinerU-HTML, you can use pip to install (recommended):
+
+```bash
+pip install mineru_html
+```
+
+or you can also clone the repository and install with core dependencies only:
 
 ```bash
 # Clone the repository
@@ -85,13 +91,13 @@ Depending on your use case, you can choose to install different backend dependen
 
 ```bash
 # Install VLLM backend dependencies (Default)
-pip install .[vllm]
+pip install mineru_html[vllm]
 
 # Install OpenAI backend dependencies
-pip install .[openai]
+pip install mineru_html[openai]
 
 # Install all dependencies
-pip install .[all]
+pip install mineru_html[all]
 ```
 
 ### Basic Usage
@@ -118,13 +124,13 @@ extractor = MinerUHTML(
 # process single HTML
 html_content = '<html>...</html>'
 result = extractor.process(html_content)
-print(result[0].main_content)
+print(result[0].output_data.main_content)
 
 # process multi HTML
 html_list = ['<html>...</html>', '<html>...</html>']
 results = extractor.process(html_list)
 for result in results:
-    print(result.main_content)
+    print(result.output_data.main_content)
     print(result.case_id)
 extractor.llm.cleanup()
 ```
@@ -157,7 +163,7 @@ extractor = MinerUHTML_Transformers(
 # process HTML
 html_content = '<html>...</html>'
 result = extractor.process(html_content)
-print(result[0].main_content)
+print(result[0].output_data.main_content)
 ```
 
 ## 📖 Core Concepts
