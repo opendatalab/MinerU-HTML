@@ -66,39 +66,37 @@ huggingface-cli download opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact
 
 ### 安装
 
-#### 基础安装（核心功能）
+#### 默认安装（VLLM 后端）
 
-如需使用 MinerU-HTML 的基本功能，可以使用pip安装（推荐）：
+我们推荐使用 VLLM 后端进行安装，以获得最佳性能并适配主要使用场景：
 
 ```bash
-pip install mineru_html
+pip install mineru_html[vllm]
 ```
 
-或者也可以克隆仓库并安装核心依赖：
+从源码安装：
 
 ```bash
-# 克隆仓库
 git clone https://github.com/opendatalab/MinerU-HTML
 cd MinerU-HTML
-
-# 仅安装核心依赖
-pip install .
+pip install .[vllm]
 ```
 
-#### 安装特定后端依赖
+#### 备选后端
 
-根据您的使用场景，可以选择安装不同的后端依赖：
+如果 VLLM 不适用于您的环境（例如您希望使用不同的推理引擎、缺少 GPU 资源，或需要使用 OpenAI API），可以选择以下后端之一：
 
-```bash
-# 安装 VLLM 后端依赖（默认）
-pip install mineru_html[vllm]
+- **Transformers 后端**（使用 Hugging Face Transformers 进行本地推理，无额外依赖）：
 
-# 安装 OpenAI 后端依赖
-pip install mineru_html[openai]
+  ```bash
+  pip install mineru_html
+  ```
 
-# 安装所有依赖
-pip install mineru_html[all]
-```
+- **OpenAI API 后端**（调用远程 OpenAI 兼容 API）：
+
+  ```bash
+  pip install mineru_html[openai]
+  ```
 
 ### 基本用法
 
