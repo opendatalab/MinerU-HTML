@@ -2,6 +2,7 @@ from typing import Any, Dict, Optional
 
 from transformers import AutoTokenizer
 
+from mineru_html.base import DEFALUT_MODEL
 from mineru_html.api import MinerUHTMLConfig, MinerUHTMLGeneric
 from mineru_html.inference.factory import create_transformers_backend
 
@@ -11,7 +12,7 @@ class MinerUHTML_Transformers(MinerUHTMLGeneric):
 
     def __init__(
         self,
-        model_path: str,
+        model_path: str = None,
         config: MinerUHTMLConfig = None,
         tokenizer: Optional[AutoTokenizer] = None,
         model_init_kwargs: Optional[Dict[str, Any]] = None,
@@ -26,6 +27,10 @@ class MinerUHTML_Transformers(MinerUHTMLGeneric):
             model_init_kwargs: Optional kwargs for model initialization.
             model_gen_kwargs: Optional kwargs for model generation.
         """
+
+        if model_path is None:
+            model_path = DEFALUT_MODEL
+
         if config is None:
             config = MinerUHTMLConfig(
                 prompt_version='short_compact', response_format='compact'

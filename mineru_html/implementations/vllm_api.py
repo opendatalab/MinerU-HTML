@@ -1,3 +1,4 @@
+from mineru_html.base import DEFALUT_MODEL
 from mineru_html.api import MinerUHTMLConfig, MinerUHTMLGeneric
 from mineru_html.inference.factory import create_vllm_backend
 
@@ -5,13 +6,17 @@ from mineru_html.inference.factory import create_vllm_backend
 class MinerUHTML(MinerUHTMLGeneric):
     """MinerUHTML implementation using VLLM backend."""
 
-    def __init__(self, model_path: str, config: MinerUHTMLConfig = None):
+    def __init__(self, model_path: str = None, config: MinerUHTMLConfig = None):
         """Initialize MinerUHTML with VLLM backend.
 
         Args:
             model_path: Path to the model directory or model identifier.
             config: Optional configuration. If None, uses default config.
         """
+
+        if model_path is None:
+            model_path = DEFALUT_MODEL
+
         if config is None:
             config = MinerUHTMLConfig(
                 prompt_version='short_compact', response_format='compact'

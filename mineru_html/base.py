@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 
 from mineru_html.exceptions import MinerUHTMLError
 
+DEFALUT_MODEL = "opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact"
 
 class MinerUHTMLBase(BaseModel):
     uid: str = Field(default_factory=lambda: str(uuid4()))

@@ -58,7 +58,9 @@
 
 ### 下载模型
 
-访问 Hugging Face 页面 [MinerU-HTML-v1.1-compact](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact) 下载模型，或使用以下命令：
+你可以选择手动下载 [MinerU-HTML-v1.1-compact](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact) 模型以便离线使用。如果在代码中不指定 `model_path`，模型将自动从 Hugging Face 下载。
+
+手动下载模型，请使用以下命令：
 
 ```bash
 huggingface-cli download opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact
@@ -103,19 +105,42 @@ pip install .[vllm]
 #### 默认用法（GPU 上的 VLLM 后端）
 
 ```python
+from mineru_html import MinerUHTML
+
+# model_path 可选；如果不指定，将自动下载默认模型
+extractor = MinerUHTML()
+
+# 处理单个 HTML
+html_content = '<html>...</html>'
+result = extractor.process(html_content)
+print(result[0].output_data.main_content)
+
+# 批量处理 HTML
+html_list = ['<html>...</html>', '<html>...</html>']
+results = extractor.process(html_list)
+for result in results:
+    print(result.output_data.main_content)
+    print(result.case_id)
+
+extractor.llm.cleanup()
+```
+
+更多配置参数：
+
+```python
 from mineru_html import MinerUHTML, MinerUHTMLConfig
 
-
 config = MinerUHTMLConfig(
-    use_fall_back='trafilatura',    # 可选 'trafilatura','bypass' 或 'empty'
-    prompt_version='short_compact', # v1.1 仅支持 'short_compact'
-    response_format='compact',      # v1.1 仅支持 'compact'
-    early_load=True
+    use_fall_back='trafilatura',     # 可选 'trafilatura','bypass' 或 'empty'
+                                     # 默认使用 trafilatura 作为回退，
+                                     # bypass 将返回原始 html作为回退，
+                                     # empty 将返回空字符串作为回退，
+    early_load=True                  # True: 立即加载模型；False: 尽量延迟加载
 )
 
 # 初始化 MinerUHTML
 extractor = MinerUHTML(
-    model_path='path/to/your/model',
+    model_path='path/to/your/model', # 你自己的模型路径
     config=config
 )
 
@@ -139,15 +164,17 @@ extractor.llm.cleanup()
 from mineru_html import MinerUHTML_Transformers, MinerUHTMLConfig
 
 config = MinerUHTMLConfig(
-    use_fall_back='trafilatura',
-    prompt_version='short_compact',  # v1.1 仅支持 'short_compact'
-    response_format='compact',       # v1.1 仅支持 'compact'
-    early_load=True
+    use_fall_back='trafilatura',     # 可选 'trafilatura','bypass' 或 'empty'
+                                     # 默认使用 trafilatura 作为回退，
+                                     # bypass 将返回原始 html作为回退，
+                                     # empty 将返回空字符串作为回退，
+    early_load=True                  # True: 立即加载模型；False: 尽量延迟加载
 )
 
 # 初始化 MinerUHTML_Transformers
+# model_path 可选；如果不指定，将自动下载默认模型
 extractor = MinerUHTML_Transformers(
-    model_path='path/to/your/model',
+    model_path='path/to/your/model', # 你自己的模型路径
     config=config,
     model_init_kwargs={
         'device_map': 'auto',

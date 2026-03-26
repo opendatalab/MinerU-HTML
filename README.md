@@ -58,7 +58,9 @@ where * denotes that use GPT-5/Deepseek-V3 to extract the main html in MinerU-HT
 
 ### Download the model
 
-visit our model at [MinerU-HTML-v1.1-compact](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact) and download the model, you can use the following command to download the model:
+You can optionally download the [MinerU-HTML-v1.1-compact](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact) model manually for offline use. If you do not specify `model_path` in the code, the model will be downloaded automatically from Hugging Face.
+
+To manually download the model, use the following command:
 
 ```bash
 huggingface-cli download opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact
@@ -102,19 +104,42 @@ pip install mineru_html[openai]
 #### Default Usage (VLLM Backend on GPU)
 
 ```python
+from mineru_html import MinerUHTML
+
+# model_path is optional; if omitted, the default model will be downloaded automatically
+extractor = MinerUHTML()
+
+# process single HTML
+html_content = '<html>...</html>'
+result = extractor.process(html_content)
+print(result[0].output_data.main_content)
+
+# process multi HTML
+html_list = ['<html>...</html>', '<html>...</html>']
+results = extractor.process(html_list)
+for result in results:
+    print(result.output_data.main_content)
+    print(result.case_id)
+
+extractor.llm.cleanup()
+```
+
+More config arguments:
+
+```python
 from mineru_html import MinerUHTML, MinerUHTMLConfig
 
-
 config = MinerUHTMLConfig(
-    use_fall_back='trafilatura',    # optional 'trafilatura','bypass' or 'empty'
-    prompt_version='short_compact', # only support 'short_compact' for v1.1
-    response_format='compact',      # only support 'compact' for v1.1
-    early_load=True
+    use_fall_back='trafilatura',     # optional 'trafilatura','bypass' or 'empty', 
+                                     # default use trafilatura as fallback, 
+                                     # bypass will return raw html as fallback, 
+                                     # empty will return empty string as fallback,
+    early_load=True                  # True: Load model immediately; False: Load model as late as possible
 )
 
 # initialize MinerUHTML
 extractor = MinerUHTML(
-    model_path='path/to/your/model',
+    model_path='path/to/your/model', # Your own model path
     config=config
 )
 
@@ -138,15 +163,17 @@ extractor.llm.cleanup()
 from mineru_html import MinerUHTML_Transformers, MinerUHTMLConfig
 
 config = MinerUHTMLConfig(
-    use_fall_back='trafilatura',
-    prompt_version='short_compact',  # only support 'short_compact' for v1.1
-    response_format='compact',       # only support 'compact' for v1.1
-    early_load=True
+    use_fall_back='trafilatura',     # optional 'trafilatura','bypass' or 'empty', 
+                                     # default use trafilatura as fallback, 
+                                     # bypass will return raw html as fallback, 
+                                     # empty will return empty string as fallback,
+    early_load=True                  # True: Load model immediately; False: Load model as late as possible
 )
 
 # initialize MinerUHTML_Transformers
+# model_path is optional; if omitted, the default model will be downloaded automatically
 extractor = MinerUHTML_Transformers(
-    model_path='path/to/your/model',
+    model_path='path/to/your/model', # Your own model path
     config=config,
     model_init_kwargs={
         'device_map': 'auto',
