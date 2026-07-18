@@ -1,10 +1,13 @@
-from typing import Any, Dict, Optional
+from __future__ import annotations
 
-from transformers import AutoTokenizer
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
-from mineru_html.base import DEFALUT_MODEL
 from mineru_html.api import MinerUHTMLConfig, MinerUHTMLGeneric
+from mineru_html.base import DEFALUT_MODEL
 from mineru_html.inference.factory import create_transformers_backend
+
+if TYPE_CHECKING:
+    from transformers import AutoTokenizer
 
 
 class MinerUHTML_Transformers(MinerUHTMLGeneric):
