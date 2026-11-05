@@ -10,11 +10,12 @@
 
 或
 
-[**下载模型进行本地部署 -\> MinerU-HTML-v1.1**](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact) —— 现已更新至 v1.1 版本！
+[**下载模型进行本地部署 -\> MinerU-HTML-v1.1**](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-qwen3.5-0.8B-compact) —— 现已更新至 v1.1 版本！
 
 ## 最新动态
 
-  - 2026.03.19 🎉 [MinerU-HTML-v1.1](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact) 发布！相比 v1.0 版本更高效、更强大，现已集成 [MinerU-Webkit](https://github.com/opendatalab/MinerU-Webkit)，支持 HTML 到 Markdown/JSON/Txt 的转换。欢迎使用！
+  - 2026.11.05 🎉 [MinerU-HTML-v1.1 新增基于 Qwen3.5-0.8B 的模型版本](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-qwen3.5-0.8B-compact)！沿用 compact 输出格式，可直接替换旧版本使用，欢迎体验！
+  - 2026.03.19 🎉 [MinerU-HTML-v1.1](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-qwen3.5-0.8B-compact) 发布！相比 v1.0 版本更高效、更强大，现已集成 [MinerU-Webkit](https://github.com/opendatalab/MinerU-Webkit)，支持 HTML 到 Markdown/JSON/Txt 的转换。欢迎使用！
   - 2025.12.1 🎉 [AICC](https://huggingface.co/datasets/opendatalab/AICC) 数据集发布，欢迎使用！AICC 数据集包含 7.3T 由 MinerU-HTML 提取并转换成 Markdown 格式的网页，具有更干净的正文内容以及高质量的代码、公式和表格。
   - 2025.12.1 🎉 [MinerU-HTML](https://huggingface.co/opendatalab/MinerU-HTML) 模型发布！该模型基于 Qwen3 进行微调，在 HTML 正文提取任务上表现卓越。
   - 2025.12.1 🎉 体验页面上线，欢迎访问 [Opendatalab-AICC](https://opendatalab.com/ai-ready/AICC#playground) 试用我们的提取工具！
@@ -39,7 +40,8 @@
 | ---------------- | ---------- |
 | DeepSeek-V3\*    | 0.9098     |
 | GPT-5\*          | 0.9024     |
-| MinerU-HTML-v1.1 | 0.9001     |
+| MinerU-HTML-v1.1 (Qwen3.5-0.8B) | 0.9042     |
+| MinerU-HTML-v1.1 (Hunyuan-0.5B) | 0.9001     |
 | Magic-HTML       | 0.7138     |
 | Readability      | 0.6542     |
 | Trafilatura      | 0.6402     |
@@ -58,13 +60,15 @@
 
 ### 下载模型
 
-你可以选择手动下载 [MinerU-HTML-v1.1-compact](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact) 模型以便离线使用。如果在代码中不指定 `model_path`，模型将自动从 Hugging Face 下载。
+你可以选择手动下载 [MinerU-HTML-v1.1-qwen3.5-0.8B-compact](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-qwen3.5-0.8B-compact) 模型以便离线使用。如果在代码中不指定 `model_path`，模型将自动从 Hugging Face 下载。
 
 手动下载模型，请使用以下命令：
 
 ```bash
-huggingface-cli download opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact
+huggingface-cli download opendatalab/MinerU-HTML-v1.1-qwen3.5-0.8B-compact
 ```
+
+> 旧版模型：[MinerU-HTML-v1.1-hunyuan0.5B-compact](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact)（历史版本，不再维护）。
 
 ### 安装
 
@@ -381,6 +385,6 @@ MinerU-HTML 支持与多种主流提取器进行对比评估：
 
   - 基于 [vLLM](https://github.com/vllm-project/vllm) 构建，实现高效的 LLM 推理。
   - 使用 [Trafilatura](https://github.com/adbar/trafilatura) 作为回退提取机制。
-  - 基于 [Hunyuan](https://github.com/Tencent-Hunyuan/Hunyuan-0.5B) 进行微调。
+  - 基于 [Qwen3.5-0.8B](https://huggingface.co/Qwen/Qwen3.5-0.8B-Base) 进行微调。
   - 受到多项 HTML 内容提取研究的启发。
   - 使用 [dingo](https://github.com/MigoXLab/dingo) 进行 LLM-as-a-judge 成对胜率评估。

@@ -24,7 +24,7 @@ class MinerUHTML(MinerUHTMLGeneric):
 
         model_init_kwargs = {
             'tensor_parallel_size': 1,
-            'gpu_memory_utilization': 0.8,
+            'gpu_memory_utilization': 0.4,
         }
 
         llm = create_vllm_backend(

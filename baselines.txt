@@ -10,4 +10,4 @@ html2text
 html_text
 jieba
 rouge_score
-# magic-html @ https://github.com/opendatalab/magic-html/releases/download/magic_html-0.1.5-released/magic_html-0.1.5-py3-none-any.whl
+magic-html @ https://github.com/opendatalab/magic-html/releases/download/magic_html-0.1.6-released/magic_html-0.1.6-py3-none-any.whl

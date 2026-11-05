@@ -1,7 +1,7 @@
 accelerate
 beautifulsoup4
 lxml
-mineru_webkit
+mineru_webkit @ https://github.com/opendatalab/MinerU-Webkit/releases/download/MinerU-Webkit-0.1.6-released/mineru_webkit-0.1.6-py3-none-any.whl
 pytest
 pytest-asyncio
 selectolax

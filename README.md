@@ -10,11 +10,12 @@ Welcome to try our online document extraction tool! Supports HTML main content e
 
 OR
 
-[**Download the model for local usage -> MinerU-HTML-v1.1**](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact) —— Now updated to v1.1 !
+[**Download the model for local usage -> MinerU-HTML-v1.1**](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-qwen3.5-0.8B-compact) —— Now updated to v1.1 !
 
 ## News
 
-- 2026.03.19 🎉 The [MinerU-HTML-v1.1](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact) is released! A more efficient and powerful version than v1.0, now integrated with [MinerU-Webkit](https://github.com/opendatalab/MinerU-Webkit) for HTML-to-Markdown/JSON/Txt conversion. Welcome to use!
+- 2026.11.05 🎉 A new [Qwen3.5-0.8B-based MinerU-HTML-v1.1 checkpoint](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-qwen3.5-0.8B-compact) is now available! It keeps the compact output format and can be used as a drop-in replacement for the previous release. Welcome to use!
+- 2026.03.19 🎉 The [MinerU-HTML-v1.1](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-qwen3.5-0.8B-compact) is released! A more efficient and powerful version than v1.0, now integrated with [MinerU-Webkit](https://github.com/opendatalab/MinerU-Webkit) for HTML-to-Markdown/JSON/Txt conversion. Welcome to use!
 - 2025.12.1 🎉 The [AICC](https://huggingface.co/datasets/opendatalab/AICC) dataset is released, welcome to use! AICC dataset contains 7.3T web pages extracted and converted to Markdown format by MinerU-HTML, with cleaner main content and high-quality code, formulas, and tables.
 - 2025.12.1 🎉 The [MinerU-HTML](https://huggingface.co/opendatalab/MinerU-HTML) model is released, welcome to use! MinerU-HTML model is a fine-tuned model on Qwen3, with better performance on HTML main content extraction.
 - 2025.12.1 🎉 The trial page is online, welcome to visit [Opendatalab-AICC](https://opendatalab.com/ai-ready/AICC#playground) to try our extraction tool!
@@ -39,7 +40,8 @@ We evaluated MinerU-HTML on the [WebMainBench v1.1](https://github.com/opendatal
 | ---------------- | ---------- |
 | DeepSeek-V3\*    | 0.9098     |
 | GPT-5\*          | 0.9024     |
-| MinerU-HTML-v1.1 | 0.9001     |
+| MinerU-HTML-v1.1 (Qwen3.5-0.8B) | 0.9042     |
+| MinerU-HTML-v1.1 (Hunyuan-0.5B) | 0.9001     |
 | Magic-HTML       | 0.7138     |
 | Readability      | 0.6542     |
 | Trafilatura      | 0.6402     |
@@ -58,13 +60,15 @@ where * denotes that use GPT-5/Deepseek-V3 to extract the main html in MinerU-HT
 
 ### Download the model
 
-You can optionally download the [MinerU-HTML-v1.1-compact](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact) model manually for offline use. If you do not specify `model_path` in the code, the model will be downloaded automatically from Hugging Face.
+You can optionally download the [MinerU-HTML-v1.1-qwen3.5-0.8B-compact](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-qwen3.5-0.8B-compact) model manually for offline use. If you do not specify `model_path` in the code, the model will be downloaded automatically from Hugging Face.
 
 To manually download the model, use the following command:
 
 ```bash
-huggingface-cli download opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact
+huggingface-cli download opendatalab/MinerU-HTML-v1.1-qwen3.5-0.8B-compact
 ```
+
+> Previous version: [MinerU-HTML-v1.1-hunyuan0.5B-compact](https://huggingface.co/opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact) (legacy, no longer maintained).
 
 ### Installation
 
@@ -380,6 +384,6 @@ If you use the extracted [AICC](https://huggingface.co/datasets/opendatalab/AICC
 
 - Built on top of [vLLM](https://github.com/vllm-project/vllm) for efficient LLM inference
 - Uses [Trafilatura](https://github.com/adbar/trafilatura) for fallback extraction
-- Finetuned on [Hunyuan](https://github.com/Tencent-Hunyuan/Hunyuan-0.5B)
+- Finetuned on [Qwen3.5-0.8B](https://huggingface.co/Qwen/Qwen3.5-0.8B-Base)
 - Inspired by various HTML content extraction research
 - Pairwise win rates LLM-as-a-judge by [dingo](https://github.com/MigoXLab/dingo)

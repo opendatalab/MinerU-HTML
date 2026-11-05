@@ -90,10 +90,13 @@ class InferenceBackend(ABC):
         tokenizer = self.get_tokenizer()
         for k, v in generate_input_map.items():
             if callable(get_attribute(tokenizer, 'apply_chat_template')):
-                msg = [{'role': 'user', 'content': v.full_prompt}]
+                msg = [
+                    {'role': 'system', 'content': 'You are a helpful assistant.'},
+                    {'role': 'user', 'content': v.full_prompt},
+                ]
                 v.full_prompt = tokenizer.apply_chat_template(
-                    msg, tokenize=False, enable_thinking=False
-                )
+                    msg, tokenize=False, enable_thinking=False, add_generation_prompt=True,
+                ).removesuffix('<think>\n\n</think>\n\n')
             valid, item_ids = self.check_input_length(v)
             if valid:
                 valid_input_keys.append(k)
