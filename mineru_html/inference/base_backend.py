@@ -1,12 +1,15 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Dict, Optional, Tuple
-
-from transformers import AutoTokenizer
+from typing import TYPE_CHECKING, Dict, Optional, Tuple
 
 from mineru_html.base import MinerUHTMLGenerateInput, MinerUHTMLGenerateOutput
 from mineru_html.exceptions import MinerUHTMLError, MinerUHTMLInputTooLongError
 from mineru_html.utils import build_dummy_response, get_all_item_ids
+
+if TYPE_CHECKING:
+    from transformers import AutoTokenizer
 
 
 @dataclass
